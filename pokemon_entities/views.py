@@ -70,7 +70,7 @@ def show_pokemon(request, pokemon_id):
             request.build_absolute_uri(pokemon.image.url)
         )
     pokemon_structure = {"pokemon_id": pokemon.id,
-                         "img_url": pokemon.image.url, "title_ru": pokemon.title, "description": pokemon.description}
+                         "img_url": pokemon.image.url, "title_en": pokemon.title_en, "title_jp": pokemon.title_jp, "title_ru": pokemon.title, "description": pokemon.description}
 
     return render(request, 'pokemon.html', context={
         'map': folium_map._repr_html_(), 'pokemon': pokemon_structure
