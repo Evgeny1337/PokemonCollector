@@ -8,6 +8,8 @@ class Pokemon(models.Model):
     description = models.TextField(null=True)
     title_en = models.CharField(max_length=400, null=True)
     title_jp = models.CharField(max_length=400, null=True)
+    parent = models.ForeignKey(
+        'self', null=True, verbose_name='Предок покемона', on_delete=models.CASCADE)
 
     def __str__(self):
         return '{}'.format(self.title)
