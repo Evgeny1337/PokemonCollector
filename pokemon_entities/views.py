@@ -16,7 +16,6 @@ DEFAULT_IMAGE_URL = (
 
 
 def add_pokemon(folium_map, lat, lon, image_url=DEFAULT_IMAGE_URL):
-    print('heh', image_url)
     icon = folium.features.CustomIcon(
         image_url,
         icon_size=(50, 50),
@@ -30,7 +29,6 @@ def add_pokemon(folium_map, lat, lon, image_url=DEFAULT_IMAGE_URL):
 def show_all_pokemons(request):
     pokemons = PokemonEntity.objects.filter(
         appeared_at__lte=localtime(), disappeared_at__gte=localtime())
-    print("test:", len(pokemons))
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
     for pokemon in pokemons:
         add_pokemon(
@@ -63,7 +61,7 @@ def show_pokemon(request, pokemon_id):
         return HttpResponseNotFound('<h1>Такой покемон не найден</h1>')
     pokemon = all_pokemons.get(id=pokemon_id)
     pre_evol = pokemon.parent
-    next_evol = all_pokemons.filter(parent__id=pokemon_id).first()
+    next_evol = pokemon.children.first()
     for pokemon_entity in pokemon_entities:
         add_pokemon(
             folium_map, pokemon_entity.latitude,
