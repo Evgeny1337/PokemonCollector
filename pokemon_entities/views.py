@@ -5,7 +5,7 @@ from django.http import HttpResponseNotFound
 from django.shortcuts import render
 from .models import Pokemon, PokemonEntity
 from django.utils.timezone import localtime
-
+from django.shortcuts import get_object_or_404
 
 MOSCOW_CENTER = [55.751244, 37.618423]
 DEFAULT_IMAGE_URL = (
@@ -27,8 +27,9 @@ def add_pokemon(folium_map, lat, lon, image_url=DEFAULT_IMAGE_URL):
 
 
 def show_all_pokemons(request):
+    time_now = localtime()
     pokemons = PokemonEntity.objects.filter(
-        appeared_at__lte=localtime(), disappeared_at__gte=localtime())
+        appeared_at__lte=time_now, disappeared_at__gte=time_now)
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
     for pokemon in pokemons:
         add_pokemon(
@@ -54,12 +55,10 @@ def show_all_pokemons(request):
 
 def show_pokemon(request, pokemon_id):
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
-    all_pokemons = Pokemon.objects.all()
+    time_now = localtime()
     pokemon_entities = PokemonEntity.objects.filter(
-        pokemon__id=pokemon_id, appeared_at__lte=localtime(), disappeared_at__gte=localtime())
-    if len(pokemon_entities) <= 0:
-        return HttpResponseNotFound('<h1>Такой покемон не найден</h1>')
-    pokemon = all_pokemons.get(id=pokemon_id)
+        pokemon__id=pokemon_id, appeared_at__lte=time_now, disappeared_at__gte=time_now)
+    pokemon = get_object_or_404(Pokemon,pk=pokemon_id)
     pre_evol = pokemon.parent
     next_evol = pokemon.children.first()
     for pokemon_entity in pokemon_entities:
