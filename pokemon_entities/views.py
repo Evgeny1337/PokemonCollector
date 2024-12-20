@@ -59,8 +59,7 @@ def show_pokemon(request, pokemon_id):
     pokemon_entities = PokemonEntity.objects.filter(
         pokemon__id=pokemon_id, appeared_at__lte=time_now, disappeared_at__gte=time_now)
     pokemon = get_object_or_404(Pokemon,pk=pokemon_id)
-    pre_evol = pokemon.parent
-    next_evol = pokemon.children.first()
+
     for pokemon_entity in pokemon_entities:
         add_pokemon(
             folium_map, pokemon_entity.latitude,
@@ -69,12 +68,14 @@ def show_pokemon(request, pokemon_id):
         )
     pokemon_structure = {"pokemon_id": pokemon.id,
                          "img_url": pokemon.image.url, "title_en": pokemon.title_en, "title_jp": pokemon.title_jp, "title_ru": pokemon.title, "description": pokemon.description}
-    if pre_evol:
+    previous_evolution = pokemon.parent
+    if previous_evolution:
         pokemon_structure['previous_evolution'] = {
-            "title_ru": pre_evol.title, "pokemon_id": pre_evol.id, "img_url": pre_evol.image.url}
-    if next_evol:
+            "title_ru": previous_evolution.title, "pokemon_id": previous_evolution.id, "img_url": previous_evolution.image.url}
+    next_evolution = pokemon.children.first()
+    if next_evolution:
         pokemon_structure["next_evolution"] = {
-            "title_ru": next_evol.title, "pokemon_id": next_evol.id, "img_url": next_evol.image.url}
+            "title_ru": next_evolution.title, "pokemon_id": next_evolution.id, "img_url": next_evolution.image.url}
     return render(request, 'pokemon.html', context={
         'map': folium_map._repr_html_(), 'pokemon': pokemon_structure
     })
